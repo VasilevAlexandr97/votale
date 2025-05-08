@@ -32,5 +32,14 @@ def run_scenario(scenario_name: str, scenario_cls: type[Scenario]):
     container.close()
 
 
+def run_poll_cycle():
+    settings = load_app_settings()
+    container = make_container(
+        context={AppSettings: settings},
+    )
+    
+    container.close()
+
+
 if __name__ == "__main__":
     run_scenario("astrocatcoin", AstroCatCoinScenario)

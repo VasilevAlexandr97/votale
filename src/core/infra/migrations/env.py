@@ -6,9 +6,9 @@ from sqlalchemy import engine_from_config, pool
 from core.config.settings import load_app_settings
 from core.infra.db.models.base import Base
 from core.infra.db.models.scenario import (
-    ScenarioChosenOption,
-    ScenarioMessage,
     ScenarioState,
+    ScenarioMessage,
+    ScenarioPollResult,
 )
 
 settings = load_app_settings()

@@ -12,6 +12,6 @@ class Scenario(Protocol):
 
     def compose_publication(
         self,
-        state: ScenarioStateSchemaT,
+        state: type[ScenarioStateSchemaT],
     ) -> tuple[str, list[str]]:
         ...

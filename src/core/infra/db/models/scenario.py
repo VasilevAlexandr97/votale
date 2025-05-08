@@ -18,34 +18,33 @@ class ScenarioState(Base, TimestampsMixin):
     )
     scenario_name: Mapped[str] = mapped_column(nullable=False)
 
-    chosen_option: Mapped["ScenarioChosenOption"] = relationship(
-        uselist=False,
-        back_populates="scenario_state",
+    messages: Mapped[list["ScenarioMessage"]] = relationship(
+        back_populates="state",
         cascade="all, delete-orphan",
     )
-    messages: Mapped[list["ScenarioMessage"]] = relationship(
+    poll_results: Mapped[list["ScenarioPollResult"]] = relationship(
         back_populates="state",
         cascade="all, delete-orphan",
     )
 
 
-class ScenarioChosenOption(Base, TimestampsMixin):
-    __tablename__ = "scenario_chosen_options"
+class ScenarioPollResult(Base, TimestampsMixin):
+    __tablename__ = "scenario_poll_results"
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    option: Mapped[dict[str, Any]] = mapped_column(
+    message_id: Mapped[int] = mapped_column(nullable=False)
+    result: Mapped[dict[str, Any]] = mapped_column(
         JSON,
         nullable=False,
     )
 
     state_id: Mapped[int] = mapped_column(
         ForeignKey("scenario_states.id", ondelete="CASCADE"),
-        unique=True,
         nullable=False,
     )
-    scenario_state: Mapped[ScenarioState] = relationship(
-        back_populates="chosen_option",
+    state: Mapped["ScenarioState"] = relationship(
+        back_populates="poll_results",
     )
 
 
