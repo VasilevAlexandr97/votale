@@ -1,0 +1,105 @@
+[project]
+name = "votale"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "VasilevAlexandr97",email = "vasilev.alex.work@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic (>=2.11.4,<3.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)",
+    "sqlalchemy (>=2.0.40,<3.0.0)",
+    "alembic (>=1.15.2,<2.0.0)",
+    "dishka (>=1.5.3,<2.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "pyyaml (>=6.0.2,<7.0.0)",
+    "google-genai (>=1.13.0,<2.0.0)",
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.6"
+mypy = "^1.15.0"
+types-pyyaml = "^6.0.12.20250402"
+types-requests = "^2.32.0.20250328"
+
+[tool.mypy]
+ignore_missing_imports = true
+python_version = "3.13"
+
+[tool.ruff]
+# https://docs.astral.sh/ruff/rules/
+lint.select = ["ALL"]
+lint.ignore = [
+    "ANN",    # flake8-annotations
+    "D",      # pydocstyle (D)
+    "B904",   # raise-without-from-inside-except
+    "ERA001", # commented-out-code
+    "RUF003", # raise-without-from-inside-except
+    "EM101",  # raw-string-in-exception
+    "EM102",  # f-string-in-exception
+    "SIM108", # if-else-block-instead-of-if-exp
+    "TRY003", # raise-vanilla-args
+    "TCH003", # typing-only-standard-library-import
+    "E731",   # do-not-use-lambda
+    "BLE001", # do-not-catch-blind-exception
+    "G004",   # logging-f-string
+    "TRY301", # use-exception-inner-function
+    "FBT001", # boolean-positional-arg-in-function-definition
+    "FBT002", # boolean-keyword-arg-in-function-definition
+    "RUF002"
+]
+
+# https://docs.astral.sh/ruff/settings/
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "dist",
+    "node_modules",
+    "venv",
+    ".helm",
+]
+
+# Same as Black
+line-length = 79
+
+# Assume Python 3.10
+target-version = "py313"
+
+[tool.ruff.lint.isort]
+force-wrap-aliases = true
+force-single-line = false
+combine-as-imports = true
+lines-between-types = 1
+
+[tool.ruff.lint.pydocstyle]
+# Use Google-style docstrings.
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
