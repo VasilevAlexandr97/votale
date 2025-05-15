@@ -33,7 +33,7 @@ class GeminiClient:
     def generate_structured(
         self,
         prompt: str,
-        response_model_cls: type[T],
+        response_schema_cls: type[T],
         *,
         temperature: float = 1,
     ) -> T:
@@ -42,7 +42,7 @@ class GeminiClient:
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
-                response_schema=response_model_cls,
+                response_schema=response_schema_cls,
                 temperature=temperature,
             ),
         )

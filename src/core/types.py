@@ -1,11 +1,11 @@
 from enum import StrEnum
 from typing import TypeVar
 
-from pydantic import BaseModel
+from core.schemas import BaseState
 
-ScenarioStateSchemaT = TypeVar("ScenarioStateSchemaT", bound=BaseModel)
+ScenarioStateSchemaT = TypeVar("ScenarioStateSchemaT", bound=BaseState)
 
 
-class ScenarioMessageType(StrEnum):
+class MessageType(StrEnum):
     STATE = "state"
     POLL = "poll"

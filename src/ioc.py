@@ -12,15 +12,21 @@ from core.config.settings import (
     PostgresSettings,
     TelegramSettings,
 )
+from core.engine.poll_manager import PollManager
 from core.engine.prompt_manager import PromptManager
 from core.engine.publication_manager import PublicationManager
 from core.engine.scenario_manager import ScenarioManager
 from core.engine.state_manager import StateManager
 from core.infra.db.database import new_session_maker
-from core.infra.repositories.scenario import ScenarioMessageRepository, ScenarioStateRepository
+from core.infra.db.transaction_manager import TransactionManager
+from core.infra.repositories.message import MessageRepository
+from core.infra.repositories.poll import PollRepository
+from core.infra.repositories.scenario_state import (
+    ScenarioStateRepository,
+)
 from core.integrations.gemini import GeminiClient
 from core.integrations.telegram import TelegramClient
-from core.interfaces import Scenario
+from core.interfaces import ScenarioProtocol
 
 
 class AppProvider(Provider):
@@ -51,6 +57,7 @@ class AppProvider(Provider):
 
 class DatabaseProvider(Provider):
     scope = Scope.REQUEST
+
     @provide(scope=Scope.APP)
     def get_session_maker(
         self,
@@ -67,6 +74,13 @@ class DatabaseProvider(Provider):
             yield session
 
     @provide(scope=Scope.REQUEST)
+    def get_transaction_manager(
+        self,
+        session: Session,
+    ) -> TransactionManager:
+        return TransactionManager(session=session)
+
+    @provide(scope=Scope.REQUEST)
     def get_scenario_state_repository(
         self,
         session: Session,
@@ -74,11 +88,18 @@ class DatabaseProvider(Provider):
         return ScenarioStateRepository(session=session)
 
     @provide(scope=Scope.REQUEST)
-    def get_scenario_message_repository(
+    def get_poll_repository(
         self,
         session: Session,
-    ) -> ScenarioMessageRepository:
-        return ScenarioMessageRepository(session=session)
+    ) -> PollRepository:
+        return PollRepository(session=session)
+
+    @provide(scope=Scope.REQUEST)
+    def get_message_repository(
+        self,
+        session: Session,
+    ) -> MessageRepository:
+        return MessageRepository(session=session)
 
 
 class IntegrationsProvider(Provider):
@@ -108,7 +129,7 @@ class ScenarioProvider(Provider):
     def __init__(
         self,
         scenario_name: str,
-        scenario_cls: type[Scenario],
+        scenario_cls: type[ScenarioProtocol],
     ):
         super().__init__()
         self._scenario_name = scenario_name
@@ -126,38 +147,44 @@ class ScenarioProvider(Provider):
             tg_chat_id=tg_chat_id,
         )
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def get_scenario_manager(
         self,
-        scenario: Scenario,
+        scenario: ScenarioProtocol,
+        state_manager: StateManager,
+        poll_manager: PollManager,
         publication_manager: PublicationManager,
+        transaction_manager: TransactionManager,
     ) -> ScenarioManager:
         return ScenarioManager(
             scenario=scenario,
+            state_manager=state_manager,
+            poll_manager=poll_manager,
             publication_manager=publication_manager,
+            transaction_manager=transaction_manager,
         )
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def get_configured_scenario(
         self,
         scenario_settings: ScenarioSettings,
         prompt_manager: PromptManager,
         state_manager: StateManager,
-    ) -> Scenario:
+    ) -> ScenarioProtocol:
         return self._scenario_cls(
             settings=scenario_settings,
             prompt_manager=prompt_manager,
             state_manager=state_manager,
         )
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def get_prompt_manager(
         self,
         scenario_settings: ScenarioSettings,
     ) -> PromptManager:
         return PromptManager(dir_path=scenario_settings.scenario_dir_path)
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def get_state_manager(
         self,
         state_repository: ScenarioStateRepository,
@@ -168,13 +195,24 @@ class ScenarioProvider(Provider):
             gemini_client=gemini_client,
         )
 
-    @provide
+    @provide(scope=Scope.REQUEST)
     def get_publication_manager(
         self,
         telegram_client: TelegramClient,
-        message_repository: ScenarioMessageRepository,
+        message_repository: MessageRepository,
     ) -> PublicationManager:
         return PublicationManager(
             telegram_client=telegram_client,
             message_repository=message_repository,
+        )
+
+    @provide(scope=Scope.REQUEST)
+    def get_poll_manager(
+        self,
+        poll_repository: PollRepository,
+        telegram_client: TelegramClient,
+    ) -> PollManager:
+        return PollManager(
+            poll_repository=poll_repository,
+            telegram_client=telegram_client,
         )

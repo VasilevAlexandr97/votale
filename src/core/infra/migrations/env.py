@@ -5,18 +5,15 @@ from sqlalchemy import engine_from_config, pool
 
 from core.config.settings import load_app_settings
 from core.infra.db.models.base import Base
-from core.infra.db.models.scenario import (
-    ScenarioState,
-    ScenarioMessage,
-    ScenarioPollResult,
-)
+from core.infra.db.models.message import *
+from core.infra.db.models.poll import *
+from core.infra.db.models.scenario import *
 
 settings = load_app_settings()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-print(settings.postgres.psycopg_dsn)
 config.set_main_option("sqlalchemy.url", settings.postgres.psycopg_dsn)
 
 # Interpret the config file for Python logging.

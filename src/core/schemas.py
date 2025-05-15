@@ -16,5 +16,6 @@ class BaseState(BaseModel):
     id: int | None = None
     title: str
     text: str
+    question: str
     options: list[Option]
     news: list[News]
