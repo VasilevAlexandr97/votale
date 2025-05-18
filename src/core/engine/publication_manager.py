@@ -38,11 +38,11 @@ class PublicationManager:
         self,
         state_id: int,
         chat_id: int,
-        content: str,
+        text: str,
         question: str,
         options: list[str],
     ) -> tuple[dict[str, Any], dict[str, Any]]:
-        message = self.publish_message(chat_id=chat_id, text=content)
+        message = self.publish_message(chat_id=chat_id, text=text)
         poll = self.publish_poll(
             chat_id=chat_id,
             question=question,
@@ -57,6 +57,13 @@ class PublicationManager:
             message_id=poll["message_id"],
         )
         return message, poll
+
+    def publish_news(
+        self,
+        chat_id: int,
+        text: str,
+    ) -> None:
+        self.telegram_client.send_message(chat_id=chat_id, text=text)
 
     def add_state_message(
         self,

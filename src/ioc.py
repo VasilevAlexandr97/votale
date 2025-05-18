@@ -169,12 +169,10 @@ class ScenarioProvider(Provider):
         self,
         scenario_settings: ScenarioSettings,
         prompt_manager: PromptManager,
-        state_manager: StateManager,
     ) -> ScenarioProtocol:
         return self._scenario_cls(
             settings=scenario_settings,
             prompt_manager=prompt_manager,
-            state_manager=state_manager,
         )
 
     @provide(scope=Scope.REQUEST)

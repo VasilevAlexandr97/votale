@@ -59,13 +59,16 @@ class ScenarioManager:
             )
             logger.info(f"next_state: {next_state}")
             self.poll_mgr.add_poll_from_state(state=next_state)
-            post_content, question, options = self.scenario.compose_publication(
+            post_text = self.scenario.build_post_content(
+                state=next_state,
+            )
+            question, options = self.scenario.build_poll_payload(
                 state=next_state,
             )
             self.pub_mgr.publish_state(
                 state_id=next_state.id,
                 chat_id=self._chat_id,
-                content=post_content,
+                text=post_text,
                 question=question,
                 options=options,
             )
@@ -92,4 +95,19 @@ class ScenarioManager:
             self.poll_mgr.add_poll_results(
                 poll_id=poll.id,
                 results=poll_results,
+            )
+
+    def run_news_cycle(self):
+        with self.tr_mgr:
+            latest_state = self.state_mgr.get_latest_state(
+                scenario_name=self._scenario_name,
+                response_schema_cls=self.scenario.get_schema(),
+            )
+            print(f"latest_state: {latest_state}")
+            news = latest_state.news
+            news_text = self.scenario.build_news_content(state=latest_state)
+            print(f"news: {news}")
+            self.pub_mgr.publish_news(
+                chat_id=self._chat_id,
+                text=news_text,
             )

@@ -5,7 +5,7 @@ from typing import Any
 from core.infra.db.models.scenario import ScenarioState
 from core.infra.repositories.scenario_state import ScenarioStateRepository
 from core.integrations.gemini import GeminiClient
-from core.types import ScenarioStateSchemaT
+from core.schemas import BaseState
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,10 @@ class StateManager:
     def generate_state(
         self,
         prompt: str,
-        response_schema_cls: type[ScenarioStateSchemaT],
+        response_schema_cls: type[BaseState],
         *,
         llm_temperature: float,
-    ) -> ScenarioStateSchemaT:
+    ) -> BaseState:
         return self.gemini_client.generate_structured(
             prompt=prompt,
             response_schema_cls=response_schema_cls,
@@ -47,7 +47,7 @@ class StateManager:
         self,
         scenario_name: str,
         prompt: str,
-        response_schema_cls: type[ScenarioStateSchemaT],
+        response_schema_cls: type[BaseState],
         *,
         llm_temperature: float,
     ):
@@ -66,8 +66,8 @@ class StateManager:
     def get_latest_state(
         self,
         scenario_name: str,
-        response_schema_cls: type[ScenarioStateSchemaT],
-    ) -> ScenarioStateSchemaT | None:
+        response_schema_cls: type[BaseState],
+    ) -> BaseState | None:
         state = self.state_repository.get_latest_state(
             scenario_name=scenario_name,
         )

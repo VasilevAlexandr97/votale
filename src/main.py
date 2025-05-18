@@ -29,6 +29,7 @@ def run_scenario(scenario_name: str, scenario_cls: type[ScenarioProtocol]):
         sc_manager = c_req.get(ScenarioManager)
         sc_manager.run_poll_cycle()
         sc_manager.run_generation_cycle()
+        sc_manager.run_news_cycle()
     print(settings)
     container.close()
 
